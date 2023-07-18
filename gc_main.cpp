@@ -1,41 +1,33 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <wiringPi.h>
 
-#include "gc_protocol.h"
+#include "gc_controller.h"
+#include "gc_common.h"
 
-bool connectController(bool calibrate = false);
+void RebootPi(void);
 
 int main() {
-    ControllerStatus status = ControllerStatus::DISCONNECTED;
-    ControllerState state;
+    // Setup wiring pi
+	wiringPiSetup();
+	wiringPiSetupGpio();
+
+    wiringPiISR(21, INT_EDGE_FALLING, &RebootPi);
+	pinMode(21, INPUT);
+	pullUpDnControl(21, PUD_UP);
+
+    GC::Controller port_1(1, 11);
+
     while(true) {
-        if(status != ControllerStatus::CONNECTED) {
-            status = connectController();
+        if(port_1.Connect() != ControllerStatus::CONNECTED)
             continue;
-        }
 
-        status = ReadState(&state);
-        if(status == ControllerStatus::CONNECTED)
-            printf("buttonsA: %d, buttonsB: %d", state.buttonsA, state.buttonsB);
-
+        port_1.ReadState();
+        if(port_1.GetStatus() == ControllerStatus::CONNECTED)
+            printf("buttonsA: %d, buttonsB: %d", port_1.GetState().buttonsA, port_1.GetState().buttonsB);
     }
 }
 
-ControllerStatus connectController(bool calibrate) {
-    ControllerStatus st = Probe();
-    if(st != ControllerStatus::CONNECTED) return st;
-
-    OriginRequest request;
-    
-    ReadOrigin(&request, calabrate);
-    if(
-        request.state.analogStick.X != 127 &&
-        request.state.analogStick.Y != 127 &&
-        request.state.cStick.X != 127 &&
-        request.state.cStick.Y != 127 &&
-        request.state.triggers.X != 0 &&
-        request.state.triggers.Y != 0
-    )
-        connectController(true);
-
-    return st;
+void RebootPi(void) {
+    system("reboot");
 }
