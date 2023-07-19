@@ -1,6 +1,7 @@
 #include "gc_controller.h"
 
 #include <wiringPi.h>
+#include <stdio.h>
 
 namespace GC {
     Controller::Controller(int port, int pin) {
@@ -10,6 +11,22 @@ namespace GC {
         pinMode(m_data_pin, INPUT); // We dont need to drive it yet.
 	    digitalWrite(m_data_pin, LOW); // Keep it low, even before we do anything to be safe
 	    pullUpDnControl(m_data_pin, PUD_UP); // Internal pull up resistor enabled.
+    }
+
+    std::thread Controller::Start() {
+        return std::thread(&Controller::Run, this);
+    }
+
+    void Controller::Run() {
+        while(true) {
+            Connect();
+            if(m_status != ControllerStatus::CONNECTED)
+                continue;
+
+            ReadState();
+            if(GetStatus() == ControllerStatus::CONNECTED)
+                printf("buttonsA: %d, buttonsB: %d\n", GetState().buttonsA, GetState().buttonsB);
+        }
     }
 
     ControllerStatus Controller::GetStatus() {

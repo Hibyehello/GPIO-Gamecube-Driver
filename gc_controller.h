@@ -1,5 +1,8 @@
 #pragma once
 
+#include <atomic>
+#include <thread>
+
 #include "gc_common.h"
 
 namespace GC {
@@ -7,6 +10,8 @@ namespace GC {
 class Controller {
 public:
     Controller(int port, int pin);
+    std::thread Start();
+    void Run();
 
     ControllerStatus GetStatus();
     ControllerState GetState();
@@ -27,8 +32,8 @@ public:
     ControllerStatus Connect(bool calibrate = false);
 
 private:
-    ControllerStatus m_status;
-    ControllerState m_state;
+    std::atomic<ControllerStatus> m_status;
+    std::atomic<ControllerState> m_state;
     int m_port;
     int m_data_pin;
 };
