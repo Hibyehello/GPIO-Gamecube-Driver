@@ -4,6 +4,10 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+#define SERIAL_MAX_LOOP 100
+
+std::mutex print_mutex;
+
 namespace GC {
     Controller::Controller(int port, int pin) {
         m_port = port;
@@ -74,7 +78,7 @@ namespace GC {
     }
 
     void Controller::WriteSerial(uint8_t* data, uint16_t bytes){
-        for(uint16_t i = 0; i < bytes; i++){
+        for(uint16_t i = 0; i < bytes && i < SERIAL_MAX_LOOP; i++){
             // Fast and easy way.
             WriteBit(((data[i]) & 0b10000000) > 0);
             WriteBit(((data[i]) & 0b01000000) > 0);
@@ -98,7 +102,7 @@ namespace GC {
         delayMicroseconds(2);
         
         // Download our data
-        for(uint16_t i = 0; i < bytes; i++){
+        for(uint16_t i = 0; i < bytes && i < SERIAL_MAX_LOOP; i++){
             // Download a byte
             uint8_t byte = 0;
             for(uint8_t j = 0; j < 8; j++){

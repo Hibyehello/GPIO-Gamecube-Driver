@@ -6,8 +6,6 @@
 
 #include "gc_common.h"
 
-std::mutex print_mutex;
-
 namespace GC {
 
 class Controller {
@@ -15,7 +13,7 @@ public:
     Controller(int port, int pin);
     std::thread Start();
     void Run();
-    static void DebugPrint(const char* fmt, ...);
+    void DebugPrint(const char* fmt, ...);
 
     ControllerStatus GetStatus();
     ControllerState GetState();
