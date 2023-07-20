@@ -78,7 +78,7 @@ namespace GC {
     }
 
     void Controller::WriteSerial(uint8_t* data, uint16_t bytes){
-        for(uint16_t i = 0; i < bytes && i < SERIAL_MAX_LOOP; i++){
+        for(uint16_t i = 0; i < bytes && i < SERIAL_MAX_LOOPgit; i++){
             // Fast and easy way.
             WriteBit(((data[i]) & 0b10000000) > 0);
             WriteBit(((data[i]) & 0b01000000) > 0);
@@ -96,7 +96,14 @@ namespace GC {
 
     void Controller::ReadSerial(uint8_t* data, uint16_t bytes) {
         // Wait for start
-        while(digitalRead(m_data_pin) == true);
+        int i = 0;
+        while(digitalRead(m_data_pin) == true) {
+            if(i > SERIAL_MAX_LOOP) {
+                DebugPrint("Wait for start timedout, port: %d", m_port);
+                return;
+            }
+            i++;
+        }
         
         // Read Offset
         delayMicroseconds(2);
