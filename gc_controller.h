@@ -15,7 +15,7 @@ public:
     Controller(int port, int pin);
     std::thread Start();
     void Run();
-    static void DebugPrint();
+    static void DebugPrint(const char* fmt, ...);
 
     ControllerStatus GetStatus();
     ControllerState GetState();
