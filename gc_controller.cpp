@@ -78,7 +78,7 @@ namespace GC {
     }
 
     void Controller::WriteSerial(uint8_t* data, uint16_t bytes){
-        for(uint16_t i = 0; i < bytes && i < SERIAL_MAX_LOOPgit; i++){
+        for(uint16_t i = 0; i < bytes && i < SERIAL_MAX_LOOP; i++){
             // Fast and easy way.
             WriteBit(((data[i]) & 0b10000000) > 0);
             WriteBit(((data[i]) & 0b01000000) > 0);
