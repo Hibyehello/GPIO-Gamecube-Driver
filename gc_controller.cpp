@@ -24,7 +24,7 @@ namespace GC {
 
     void Controller::Run() {
         while(true) {
-            DebugPrint("Probing port: %d", m_port);
+            DebugPrint("Probing port: %d\n", m_port);
             Connect();
             if(m_status != ControllerStatus::CONNECTED)
                 continue;
@@ -99,7 +99,7 @@ namespace GC {
         int i = 0;
         while(digitalRead(m_data_pin) == true) {
             if(i > SERIAL_MAX_LOOP) {
-                DebugPrint("Wait for start timedout, port: %d", m_port);
+                DebugPrint("Wait for start timed out, port: %d\n", m_port);
                 return;
             }
             i++;
