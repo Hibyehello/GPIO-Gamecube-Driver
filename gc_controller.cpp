@@ -2,6 +2,7 @@
 
 #include <wiringPi.h>
 #include <stdio.h>
+#include <stdarg.h>
 
 namespace GC {
     Controller::Controller(int port, int pin) {
@@ -19,6 +20,7 @@ namespace GC {
 
     void Controller::Run() {
         while(true) {
+            DebugPrint("Probing port: %d", m_port);
             Connect();
             if(m_status != ControllerStatus::CONNECTED)
                 continue;
@@ -27,6 +29,16 @@ namespace GC {
             if(GetStatus() == ControllerStatus::CONNECTED)
                 printf("buttonsA: %d, buttonsB: %d\n", GetState().buttonsA, GetState().buttonsB);
         }
+    }
+
+    void Controller::DebugPrint(const char* fmt, ...) {
+        std::lock_guard<std::mutex> guard(print_mutex);
+        va_list arglist;
+        va_start(arglist, fmt);
+
+        vprintf(fmt, arglist);
+
+        va_end(arglist);
     }
 
     ControllerStatus Controller::GetStatus() {

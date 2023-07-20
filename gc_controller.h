@@ -2,8 +2,11 @@
 
 #include <atomic>
 #include <thread>
+#include <mutex>
 
 #include "gc_common.h"
+
+std::mutex print_mutex;
 
 namespace GC {
 
@@ -12,6 +15,7 @@ public:
     Controller(int port, int pin);
     std::thread Start();
     void Run();
+    static void DebugPrint();
 
     ControllerStatus GetStatus();
     ControllerState GetState();
